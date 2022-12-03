@@ -1,0 +1,8 @@
+- Github lesson
+https://github.com/evondev/react-course/tree/master/src
+- Github simple movie
+https://github.com/evondev/simple-movie/tree/master/src
+- Github monkey blogging
+https://github.com/evondev/monkey-blogging/tree/master/src
+- Movie API
+https://api.themoviedb.org/3/search/movie?api_key=a75830ccf5de99b13d1ec3a570a51a4e&query=Jack+Reacher
