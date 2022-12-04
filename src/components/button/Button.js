@@ -2,6 +2,7 @@ import React from "react";
 import styled, { css } from "styled-components";
 import PropTypes from "prop-types";
 import { LoadingSpinner } from "../loading";
+import { NavLink } from "react-router-dom";
 // import { NavLink } from "react-router-dom";
 
 const ButtonStyles = styled.button`
@@ -52,15 +53,15 @@ const Button = ({
 }) => {
   const { isLoading, to } = props;
   const child = !!isLoading ? <LoadingSpinner></LoadingSpinner> : children;
-  // if (to !== "" && typeof to === "string") {
-  //   return (
-  //     <NavLink to={to} className="inline-block">
-  //       <ButtonStyles type={type} kind={kind} {...props}>
-  //         {child}
-  //       </ButtonStyles>
-  //     </NavLink>
-  //   );
-  // }
+  if (to !== "" && typeof to === "string") {
+    return (
+      <NavLink to={to} className="inline-block">
+        <ButtonStyles type={type} kind={kind} {...props}>
+          {child}
+        </ButtonStyles>
+      </NavLink>
+    );
+  }
   return (
     <ButtonStyles type={type} kind={kind} onClick={onClick} {...props}>
       {child}
@@ -70,7 +71,6 @@ const Button = ({
 
 Button.propTypes = {
   type: PropTypes.oneOf(["button", "submit"]),
-  // isLoading: PropTypes.bool,
   onClick: PropTypes.func,
   children: PropTypes.node,
   kind: PropTypes.oneOf(["primary", "secondary", "ghost"]),

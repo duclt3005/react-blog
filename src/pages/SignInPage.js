@@ -1,20 +1,19 @@
-import { yupResolver } from "@hookform/resolvers/yup";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
 import React, { useEffect } from "react";
-import { useForm } from "react-hook-form";
 import { NavLink, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import * as Yup from "yup";
 import { Button } from "../components/button";
 import { Field } from "../components/field";
 import { Input, InputPassword } from "../components/input";
 import { Label } from "../components/label";
-import { auth, db } from "../firebase/firebase-config";
+import { useAuth } from "../contexts/auth-context";
 import AuthenticationPage from "./AuthenticationPage";
+import * as Yup from "yup";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebase-config";
 
 const schema = Yup.object({
-  fullName: Yup.string().required("Please enter your fullName"),
   email: Yup.string()
     .email("Please enter valid email address")
     .required("Please enter your email address"),
@@ -23,7 +22,8 @@ const schema = Yup.object({
     .required("Please enter your password"),
 });
 
-const SignUpPage = () => {
+const SignInPage = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const {
     control,
@@ -36,25 +36,10 @@ const SignUpPage = () => {
     resolver: yupResolver(schema),
   });
 
-  const handleSignUp = async (values) => {
-    if (!values) return;
-    const user = await createUserWithEmailAndPassword(
-      auth,
-      values.email,
-      values.password
-    );
-    await updateProfile(auth.currentUser, {
-      displayName: values.fullName,
-    });
-    const collectionRef = collection(db, "users");
-    await addDoc(collectionRef, {
-      fullName: values.fullName,
-      email: values.email,
-      password: values.password,
-    });
-    toast.success("Register successfully!");
-    navigate("/");
-  };
+  useEffect(() => {
+    document.title = "Login Page";
+    if (user?.email) navigate("/");
+  }, []);
 
   useEffect(() => {
     const arrErrors = Object.values(errors);
@@ -65,26 +50,21 @@ const SignUpPage = () => {
       });
     }
   }, [errors]);
-  useEffect(() => {
-    document.title = "Register Page";
-  }, []);
+
+  const handleSignIn = async (values) => {
+    if (!isValid) return;
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      navigate("/");
+    } catch (error) {
+      if (error.message.includes("wrong-password"))
+        toast.error("It seems your password was wrong");
+    }
+  };
 
   return (
     <AuthenticationPage>
-      <form action="" className="form" onSubmit={handleSubmit(handleSignUp)}>
-        <Field>
-          <Label htmlFor="fullName" className="label">
-            Full name
-          </Label>
-          <Input
-            type="text"
-            id="fullName"
-            name="fullName"
-            placeholder="Enter full name"
-            className="input"
-            control={control}
-          ></Input>
-        </Field>
+      <form action="" className="form" onSubmit={handleSubmit(handleSignIn)}>
         <Field>
           <Label htmlFor="email" className="label">
             Email
@@ -100,7 +80,7 @@ const SignUpPage = () => {
         </Field>
         <InputPassword control={control} />
         <div className="have-account">
-          You already have an account? <NavLink to={"/sign-in"}>Login</NavLink>{" "}
+          You do not have any account? <NavLink to={"/sign-up"}>Sign Up</NavLink>{" "}
         </div>
         <Button
           type={"submit"}
@@ -111,11 +91,11 @@ const SignUpPage = () => {
           isLoading={isSubmitting}
           disabled={isSubmitting}
         >
-          Sign up
+          Login
         </Button>
       </form>
     </AuthenticationPage>
   );
 };
 
-export default SignUpPage;
+export default SignInPage;
