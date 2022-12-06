@@ -23,6 +23,7 @@ import { Label } from "../../components/label";
 import Toggle from "../../components/toggle/Toggle";
 import { useAuth } from "../../contexts/auth-context";
 import { db } from "../../firebase/firebase-config";
+import useFirebaseImage from "../../hooks/useFirebaseImage";
 import { postStatus } from "../../utils/constants";
 import DashboardHeading from "../dashboard/DashboardHeading";
 
@@ -42,13 +43,13 @@ const PostAddNew = () => {
   });
   const watchStatus = watch("status");
   const watchHot = watch("hot");
-  // const {
-  //   image,
-  //   handleResetUpload,
-  //   progress,
-  //   handleSelectImage,
-  //   handleDeleteImage,
-  // } = useFirebaseImage(setValue, getValues);
+  const {
+    image,
+    handleResetUpload,
+    progress,
+    handleSelectImage,
+    handleDeleteImage,
+  } = useFirebaseImage(setValue, getValues);
   const [categories, setCategories] = useState([]);
   const [selectCategory, setSelectCategory] = useState("");
   const [loading, setLoading] = useState(false);
@@ -79,7 +80,7 @@ const PostAddNew = () => {
       const colRef = collection(db, "posts");
       await addDoc(colRef, {
         ...cloneValues,
-        // image,
+        image,
         createdAt: serverTimestamp(),
       });
       toast.success("Create new post successfully!");
@@ -159,11 +160,11 @@ const PostAddNew = () => {
           <Field>
             <Label>Image</Label>
             <ImageUpload
-              // onChange={handleSelectImage}
-              // handleDeleteImage={handleDeleteImage}
+              onChange={handleSelectImage}
+              handleDeleteImage={handleDeleteImage}
               className="h-[250px]"
-              // progress={progress}
-              // image={image}
+              progress={progress}
+              image={image}
             ></ImageUpload>
           </Field>
           <Field>
